@@ -1,6 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (Html, div, text)
+import Html exposing (Html, div, text, img, i)
+import Html.Attributes exposing (style, class, src, width)
 
 
 main : Program Never Model Msg
@@ -60,6 +61,24 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ text model.content
+    --div [ style [ ( "border", "1px solid black" ) ], class "bg-gray" ]
+    --    [ text model.content
+    --    ]
+    div [ class "sm-col col-12 fit slideshow" ]
+        [ div [ class "sm-col col-1 flex flex-center slideshow-height" ]
+            [ i [ class "fa fa-chevron-left fa-4x center" ]
+                []
+            ]
+        , div
+            [ class "sm-col col-10 flex flex-center slideshow-height" ]
+            [ img
+                [ class "img-slide"
+                , src "./static/images/artworks/dessins-1.png"
+                ]
+                []
+            ]
+        , div
+            [ class "sm-col col-1 flex flex-center slideshow-height" ]
+            [ i [ class "fa fa-chevron-right fa-4x flex-auto center" ] []
+            ]
         ]
