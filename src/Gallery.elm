@@ -27,6 +27,11 @@ main =
 -- MODEL
 
 
+type Direction
+    = Previous
+    | Next
+
+
 type alias Model =
     { content : String
     , images : ZipList String
@@ -61,18 +66,17 @@ init =
 
 
 type Msg
-    = NextImage
-    | PreviousImage
+    = MoveTo Direction
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        PreviousImage ->
-            ( { model | images = ZipList.back model.images }, Cmd.none )
-
-        NextImage ->
+        MoveTo Next ->
             ( { model | images = ZipList.forward model.images }, Cmd.none )
+
+        MoveTo Previous ->
+            ( { model | images = ZipList.back model.images }, Cmd.none )
 
 
 
@@ -91,7 +95,7 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ class "sm-col col-12 fit gallery" ]
-        [ viewControl model PreviousImage
+        [ viewControl model Previous
         , div
             [ class "sm-col col-10 flex flex-center gallery-height" ]
             [ img
@@ -100,33 +104,33 @@ view model =
                 ]
                 []
             ]
-        , viewControl model NextImage
+        , viewControl model Next
         ]
 
 
-viewControl : Model -> Msg -> Html Msg
-viewControl model msg =
+viewControl : Model -> Direction -> Html Msg
+viewControl model direction =
     let
         disabled_control =
-            case msg of
-                PreviousImage ->
+            case direction of
+                Previous ->
                     if ZipList.hasPrevious model.images then
                         ""
                     else
                         "disabled"
 
-                NextImage ->
+                Next ->
                     if ZipList.hasNext model.images then
                         ""
                     else
                         "disabled"
 
-        direction =
-            case msg of
-                PreviousImage ->
+        direction_style =
+            case direction of
+                Previous ->
                     "left"
 
-                NextImage ->
+                Next ->
                     "right"
     in
         div
@@ -135,12 +139,12 @@ viewControl model msg =
             [ i
                 [ class
                     ("fa fa-chevron-"
-                        ++ direction
+                        ++ direction_style
                         ++ " fa-4x flex-auto center "
                         ++ "gallery-control "
                         ++ disabled_control
                     )
-                , onClick msg
+                , onClick (MoveTo direction)
                 ]
                 []
             ]
