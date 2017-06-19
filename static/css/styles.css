@@ -6,11 +6,19 @@
   margin-right: auto;
 }
 
-.slideshow {
+.gallery {
   height: 90%;
 }
 
-.slideshow-height {
+.gallery-height {
   height: 100%;
   border: 1px solid black;
+}
+
+.gallery-control {
+  cursor: pointer;
+}
+.gallery-control.disabled {
+  cursor: default;
+  color: lightgrey;
 }

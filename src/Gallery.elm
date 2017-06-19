@@ -2,6 +2,15 @@ module Main exposing (..)
 
 import Html exposing (Html, div, text, img, i)
 import Html.Attributes exposing (style, class, src, width)
+import Html.Events exposing (onClick)
+import Helpers.ZipList as ZipList
+    exposing
+        ( ZipList
+        , init
+        , forward
+        , current
+        , hasPrevious
+        )
 
 
 main : Program Never Model Msg
@@ -19,7 +28,9 @@ main =
 
 
 type alias Model =
-    { content : String }
+    { content : String
+    , images : ZipList String
+    }
 
 
 
@@ -28,7 +39,21 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { content = "Hello" }, Cmd.none )
+    ( { content = "Hello"
+      , images =
+            ZipList.init
+                "./static/images/artworks/dessins-1.png"
+                [ "./static/images/artworks/peintures-7.jpg"
+                , "./static/images/artworks/peintures-8.jpg"
+                , "./static/images/artworks/peintures-9.jpg"
+                , "./static/images/artworks/peintures-hor.jpg"
+                , "./static/images/artworks/peintures-10.jpg"
+                , "./static/images/artworks/peintures-11.jpg"
+                , "./static/images/artworks/peintures-12.jpg"
+                ]
+      }
+    , Cmd.none
+    )
 
 
 
@@ -36,14 +61,18 @@ init =
 
 
 type Msg
-    = UpString String
+    = NextImage
+    | PreviousImage
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UpString newString ->
-            ( { model | content = newString }, Cmd.none )
+        PreviousImage ->
+            ( { model | images = ZipList.back model.images }, Cmd.none )
+
+        NextImage ->
+            ( { model | images = ZipList.forward model.images }, Cmd.none )
 
 
 
@@ -61,24 +90,57 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    --div [ style [ ( "border", "1px solid black" ) ], class "bg-gray" ]
-    --    [ text model.content
-    --    ]
-    div [ class "sm-col col-12 fit slideshow" ]
-        [ div [ class "sm-col col-1 flex flex-center slideshow-height" ]
-            [ i [ class "fa fa-chevron-left fa-4x center" ]
-                []
-            ]
+    div [ class "sm-col col-12 fit gallery" ]
+        [ viewControl model PreviousImage
         , div
-            [ class "sm-col col-10 flex flex-center slideshow-height" ]
+            [ class "sm-col col-10 flex flex-center gallery-height" ]
             [ img
                 [ class "img-slide"
-                , src "./static/images/artworks/dessins-1.png"
+                , src (ZipList.current model.images)
                 ]
                 []
             ]
-        , div
-            [ class "sm-col col-1 flex flex-center slideshow-height" ]
-            [ i [ class "fa fa-chevron-right fa-4x flex-auto center" ] []
-            ]
+        , viewControl model NextImage
         ]
+
+
+viewControl : Model -> Msg -> Html Msg
+viewControl model msg =
+    let
+        disabled_control =
+            case msg of
+                PreviousImage ->
+                    if ZipList.hasPrevious model.images then
+                        ""
+                    else
+                        "disabled"
+
+                NextImage ->
+                    if ZipList.hasNext model.images then
+                        ""
+                    else
+                        "disabled"
+
+        direction =
+            case msg of
+                PreviousImage ->
+                    "left"
+
+                NextImage ->
+                    "right"
+    in
+        div
+            [ class "sm-col col-1 flex flex-center gallery-height"
+            ]
+            [ i
+                [ class
+                    ("fa fa-chevron-"
+                        ++ direction
+                        ++ " fa-4x flex-auto center "
+                        ++ "gallery-control "
+                        ++ disabled_control
+                    )
+                , onClick msg
+                ]
+                []
+            ]
