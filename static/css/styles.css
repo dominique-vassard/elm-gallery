@@ -1,7 +1,18 @@
 .img-slide {
+  display: block;
   max-width: 90%;
   height: 90%;
-  border: 2px solid green;
+  border: 1px solid black;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+}
+
+.img-slide-modal {
+  display: block;
+  max-width: 90%;
+  height: 90%;
+  border: 1px solid black;
   margin-left: auto;
   margin-right: auto;
   cursor: pointer;
@@ -13,7 +24,6 @@
 
 .gallery-height {
   height: 100%;
-  border: 1px solid black;
 }
 
 .gallery-control {
@@ -40,14 +50,18 @@
 
 /* Modal Content/Box */
 .modal-content {
+    border: 10px solid red;
     background-color: #fefefe;
+    border-radius: 5px;
     margin: 2% auto; /* 15% from the top and centered */
     margin-left: 5%;
     margin-right: auto;
-    padding: 20px;
+    padding: 5px;
     border: 1px solid #888;
-    width: 90%; /* Could be more or less, depending on screen size */
-    height: 90%;
+    /*width: 40%; /* Could be more or less, depending on screen size */
+    max-width: 90%; /* Could be more or less, depending on screen size */
+    /*height: 90%;*/
+    overflow: visible;
 }
 
 /* The Close Button */
@@ -56,6 +70,7 @@
     float: right;
     font-size: 28px;
     font-weight: bold;
+    padding: 5px;
 }
 
 .modal-close:hover,
