@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (Html, div, text, img, i)
+import Html exposing (Html, div, text, img, i, span)
 import Html.Attributes exposing (style, class, src, width)
 import Html.Events exposing (onClick)
 import Helpers.ZipList as ZipList
@@ -33,7 +33,7 @@ type Direction
 
 
 type alias Model =
-    { content : String
+    { modal_opened : Bool
     , images : ZipList String
     }
 
@@ -44,7 +44,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { content = "Hello"
+    ( { modal_opened = False
       , images =
             ZipList.init
                 "./static/images/artworks/dessins-1.png"
@@ -67,6 +67,8 @@ init =
 
 type Msg
     = MoveTo Direction
+    | OpenModal
+    | CloseModal
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -77,6 +79,12 @@ update msg model =
 
         MoveTo Previous ->
             ( { model | images = ZipList.back model.images }, Cmd.none )
+
+        OpenModal ->
+            ( { model | modal_opened = True }, Cmd.none )
+
+        CloseModal ->
+            ( { model | modal_opened = False }, Cmd.none )
 
 
 
@@ -94,18 +102,52 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "sm-col col-12 fit gallery" ]
-        [ viewControl model Previous
-        , div
-            [ class "sm-col col-10 flex flex-center gallery-height" ]
-            [ img
-                [ class "img-slide"
-                , src (ZipList.current model.images)
+    div []
+        [ viewModal model
+        , div [ class "sm-col col-12 fit gallery" ]
+            [ viewControl model Previous
+            , div
+                [ class "sm-col col-10 flex flex-center gallery-height" ]
+                [ img
+                    [ class "img-slide"
+                    , src (ZipList.current model.images)
+                    , onClick OpenModal
+                    ]
+                    []
                 ]
-                []
+            , viewControl model Next
             ]
-        , viewControl model Next
         ]
+
+
+viewModal : Model -> Html Msg
+viewModal model =
+    let
+        modal =
+            if model.modal_opened then
+                div [ class "gallery-modal" ]
+                    [ div [ class "modal-content" ]
+                        [ div [ class "sm-col col-12" ]
+                            [ span
+                                [ class "modal-close"
+                                , onClick CloseModal
+                                ]
+                                [ text "X" ]
+                            ]
+                        , div [ class "sm-col col-12 flex flex-center" ]
+                            [ img
+                                [ class "img-slide"
+                                , src (ZipList.current model.images)
+                                , onClick CloseModal
+                                ]
+                                []
+                            ]
+                        ]
+                    ]
+            else
+                div [] []
+    in
+        modal
 
 
 viewControl : Model -> Direction -> Html Msg
